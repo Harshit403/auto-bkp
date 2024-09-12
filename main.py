@@ -12,11 +12,11 @@ import subprocess
 load_dotenv()
 
 # Get environment variables
-TOKEN = os.getenv('TG_BOT_TOKEN')
-CHAT_ID = os.getenv('TG_CHAT_ID')
-MYSQL_USER = os.getenv('MYSQL_USER')
-MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
-MYSQL_DATABASE = os.getenv('MYSQL_DATABASE')
+TOKEN = os.getenv('BOT_TOKEN')
+CHAT_ID = os.getenv('CHAT_ID')
+MYSQL_USER = os.getenv('DB_USER')
+MYSQL_PASSWORD = os.getenv('DB_PASS')
+MYSQL_DATABASE = os.getenv('DB_NAME')
 
 # Initialize bot
 bot = telepot.Bot(TOKEN)
