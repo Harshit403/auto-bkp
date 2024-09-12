@@ -3,6 +3,7 @@ import os
 import time
 from datetime import datetime
 from subprocess import Popen, PIPE
+from telepot.loop import MessageLoop
 
 # Fetch Telegram bot token, chat ID, and MySQL credentials from environment variables
 BOT_TOKEN = os.getenv('BOT_TOKEN')
@@ -52,7 +53,7 @@ def send_backup_to_telegram(sql_data):
         # Save the SQL data temporarily in-memory as a file object
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         filename = f"{DB_NAME}_{timestamp}.sql"
-        
+
         # Send the SQL data as a file to the Telegram chat
         bot.sendDocument(CHAT_ID, ('backup.sql', sql_data))
 
@@ -60,20 +61,38 @@ def send_backup_to_telegram(sql_data):
     except Exception as e:
         send_log_to_telegram(f"Error sending backup file to Telegram: {e}")
 
+def handle(msg):
+    """
+    Function to handle incoming messages and commands.
+    """
+    content_type, chat_type, chat_id = telepot.glance(msg)
+    
+    if content_type == 'text':
+        message = msg['text']
+        
+        if message == '/start':
+            bot.sendMessage(chat_id, "I'm alive and will send the backup at 11:59 PM daily!")
+            send_log_to_telegram("Received /start command - bot is alive.")
+        else:
+            bot.sendMessage(chat_id, "Unknown command. Use /start to check if I'm alive.")
+
 def run_bot():
     """
     Main function to run the bot and perform the backup at 11:59 PM daily.
     """
     send_log_to_telegram("Bot started. Waiting for 11:59 PM to perform backups.")
 
+    # Start listening for /start commands
+    MessageLoop(bot, handle).run_as_thread()
+
     while True:
         try:
             # Get current time
-            current_time = datetime.now().strftime('%H:%M')
+            now = datetime.now()
 
             # Check if time is 11:59 PM
-            if current_time == "23:59":
-                send_log_to_telegram(f"Backup process started at {current_time}")
+            if now.hour == 00 and now.minute == 15:
+                send_log_to_telegram(f"Backup process started at {now.strftime('%H:%M')}")
 
                 # Backup database in-memory and send it to Telegram
                 sql_data = backup_database()
@@ -85,8 +104,8 @@ def run_bot():
                 # Wait for 60 seconds to avoid multiple backups in the same minute
                 time.sleep(60)
             else:
-                # Wait for a minute before checking the time again
-                time.sleep(60)
+                # Wait for 30 seconds before checking the time again
+                time.sleep(30)
 
         except Exception as e:
             send_log_to_telegram(f"Error in run_bot loop: {e}")
