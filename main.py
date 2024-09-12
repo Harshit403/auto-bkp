@@ -90,7 +90,7 @@ def run_bot():
             now = datetime.now()
 
             # Check if time is 11:59 PM
-            if now.hour == 00 and now.minute == 15:
+            if now.hour == 0 and now.minute == 29:
                 send_log_to_telegram(f"Backup process started at {now.strftime('%H:%M')}")
 
                 # Backup database in-memory and send it to Telegram
