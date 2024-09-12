@@ -72,9 +72,8 @@ def handle(msg):
         
         if message == '/start':
             bot.sendMessage(chat_id, "I'm alive and will send the backup at 11:59 PM daily!")
-            send_log_to_telegram("Received /start command - bot is alive.")
         else:
-            bot.sendMessage(chat_id, "Unknown command. Use /start to check if I'm alive.")
+            bot.sendMessage(chat_id, "Unknown command. BTW, I'm alive.")
 
 def run_bot():
     """
