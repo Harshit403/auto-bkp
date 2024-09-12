@@ -17,6 +17,7 @@ CHAT_ID = os.getenv('CHAT_ID')
 MYSQL_USER = os.getenv('DB_USER')
 MYSQL_PASSWORD = os.getenv('DB_PASS')
 MYSQL_DATABASE = os.getenv('DB_NAME')
+AUTHORIZED_USER_ID = int(os.getenv('CHAT_ID'))  # Add your Telegram user ID here
 
 # Initialize bot
 bot = telepot.Bot(TOKEN)
@@ -76,7 +77,12 @@ def backup_database():
 def handle(msg):
     """Handle incoming Telegram messages."""
     content_type, chat_type, chat_id = telepot.glance(msg)
+    sender_id = msg['from']['id']
     
+    if sender_id != AUTHORIZED_USER_ID:
+        #send_message("You are not authorized to use this bot.")
+        return
+
     if content_type == 'text':
         command = msg['text'].strip().lower()
         if command == '/start':
